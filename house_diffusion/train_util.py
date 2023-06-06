@@ -40,7 +40,7 @@ class TrainLoop:
         lr_anneal_steps=0,
         analog_bit=None,
     ):
-        self.analog_bit=analog_bit
+        self.analog_bit = analog_bit
         self.model = model
         self.diffusion = diffusion
         self.data = data

@@ -36,8 +36,8 @@ def main():
         data = load_rplanhg_data(
             batch_size=args.batch_size,
             analog_bit=args.analog_bit,
-            target_set=args.target_set,
-            set_name=args.set_name,
+            target_set=8,
+            set_name="train",
         )
     else:
         print('dataset not exist!')
@@ -66,8 +66,8 @@ def main():
 
 def create_argparser():
     defaults = dict(
-        dataset = '',
-        schedule_sampler= "uniform", #"loss-second-moment", "uniform",
+        dataset='rplan',
+        schedule_sampler="uniform", #"loss-second-moment", "uniform",
         lr=1e-4,
         weight_decay=0.0,
         lr_anneal_steps=0,

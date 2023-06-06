@@ -39,18 +39,23 @@ from shapely.geos import lgeos
 # np.random.seed(0)
 
 bin_to_int = lambda x: int("".join([str(int(i.cpu().data)) for i in x]), 2)
+
+
 def bin_to_int_sample(sample, resolution=256):
     sample_new = th.zeros([sample.shape[0], sample.shape[1], sample.shape[2], 2])
-    sample[sample<0] = 0
-    sample[sample>0] = 1
+    sample[sample < 0] = 0
+    sample[sample > 0] = 1
+    print(f"Sample New {sample_new}")
     for i in range(sample.shape[0]):
         for j in range(sample.shape[1]):
             for k in range(sample.shape[2]):
                 sample_new[i, j, k, 0] = bin_to_int(sample[i, j, k, :8])
                 sample_new[i, j, k, 1] = bin_to_int(sample[i, j, k, 8:])
     sample = sample_new
-    sample = sample/(resolution/2) - 1
+    sample = sample / (resolution / 2) - 1
+    print(sample)
     return sample
+
 
 def get_graph(indx, g_true, ID_COLOR, draw_graph, save_svg):
     # build true graph
@@ -64,13 +69,13 @@ def get_graph(indx, g_true, ID_COLOR, draw_graph, save_svg):
     for k, label in enumerate(g_true[0]):
         _type = label
         if _type >= 0 and _type not in [11, 12]:
-            G_true.add_nodes_from([(k, {'label':k})])
+            G_true.add_nodes_from([(k, {'label': k})])
             colors_H.append(ID_COLOR[_type])
             node_size.append(1000)
             edgecolors.append('blue')
             linewidths.append(0.0)
     # add outside node
-    G_true.add_nodes_from([(-1, {'label':-1})])
+    G_true.add_nodes_from([(-1, {'label': -1})])
     colors_H.append("white")
     node_size.append(750)
     edgecolors.append('black')
@@ -84,8 +89,8 @@ def get_graph(indx, g_true, ID_COLOR, draw_graph, save_svg):
         if m > 0 and (_type_k not in [11, 12] and _type_l not in [11, 12]):
             G_true.add_edges_from([(k, l)])
             edge_color.append('#D3A2C7')
-        elif m > 0 and (_type_k==11 or _type_l==11):
-            if _type_k==11:
+        elif m > 0 and (_type_k == 11 or _type_l == 11):
+            if _type_k == 11:
                 G_true.add_edges_from([(l, -1)])
             else:
                 G_true.add_edges_from([(k, -1)])
@@ -93,8 +98,8 @@ def get_graph(indx, g_true, ID_COLOR, draw_graph, save_svg):
     if draw_graph:
         plt.figure()
         pos = nx.nx_agraph.graphviz_layout(G_true, prog='neato')
-        nx.draw(G_true, pos, node_size=node_size, linewidths=linewidths, node_color=colors_H, font_size=14, font_color='white',\
-                font_weight='bold', edgecolors=edgecolors, width=4.0, with_labels=False)
+        nx.draw(G_true, pos, node_size=node_size, linewidths=linewidths, node_color=colors_H, font_size=14,
+                font_color='white', font_weight='bold', edgecolors=edgecolors, width=4.0, with_labels=False)
         if save_svg:
             plt.savefig(f'outputs/graphs_gt/{indx}.svg')
         else:
@@ -102,9 +107,10 @@ def get_graph(indx, g_true, ID_COLOR, draw_graph, save_svg):
         plt.close('all')
     return G_true
 
+
 def estimate_graph(indx, polys, nodes, G_gt, ID_COLOR, draw_graph, save_svg):
     nodes = np.array(nodes)
-    G_gt = G_gt[1-th.where((G_gt == th.tensor([0,0,0], device='cuda')).all(dim=1))[0]]
+    G_gt = G_gt[1 - th.where((G_gt == th.tensor([0, 0, 0], device='cuda')).all(dim=1))[0]]
     G_gt = get_graph(indx, [nodes, G_gt], ID_COLOR, draw_graph, save_svg)
     G_estimated = nx.Graph()
     colors_H = []
@@ -117,12 +123,12 @@ def estimate_graph(indx, polys, nodes, G_gt, ID_COLOR, draw_graph, save_svg):
     for k, label in enumerate(nodes):
         _type = label
         if _type >= 0 and _type not in [11, 12]:
-            G_estimated.add_nodes_from([(k, {'label':k})])
+            G_estimated.add_nodes_from([(k, {'label': k})])
             colors_H.append(ID_COLOR[_type])
             node_size.append(1000)
             linewidths.append(0.0)
     # add outside node
-    G_estimated.add_nodes_from([(-1, {'label':-1})])
+    G_estimated.add_nodes_from([(-1, {'label': -1})])
     colors_H.append("white")
     node_size.append(750)
     edgecolors.append('black')
@@ -140,7 +146,7 @@ def estimate_graph(indx, polys, nodes, G_gt, ID_COLOR, draw_graph, save_svg):
                     p1 = geom_factory(lgeos.GEOSMakeValid(p1._geom))
                 if not p2.is_valid:
                     p2 = geom_factory(lgeos.GEOSMakeValid(p2._geom))
-                iou = p1.intersection(p2).area/ p1.union(p2).area
+                iou = p1.intersection(p2).area / p1.union(p2).area
                 if iou > 0 and iou < 0.2:
                     doors_rooms_map[k].append((l, iou))
     # draw connections
@@ -181,7 +187,9 @@ def estimate_graph(indx, polys, nodes, G_gt, ID_COLOR, draw_graph, save_svg):
         plt.figure()
         pos = nx.nx_agraph.graphviz_layout(G_estimated_complete, prog='neato')
         weights = [4 for u, v in G_estimated_complete.edges()]
-        nx.draw(G_estimated_complete, pos, edge_color=colors, linewidths=linewidths, edgecolors=edgecolors, node_size=node_size, node_color=colors_H, font_size=14, font_weight='bold', font_color='white', width=weights, with_labels=False)
+        nx.draw(G_estimated_complete, pos, edge_color=colors, linewidths=linewidths, edgecolors=edgecolors,
+                node_size=node_size, node_color=colors_H, font_size=14, font_weight='bold', font_color='white',
+                width=weights, with_labels=False)
         if save_svg:
             plt.savefig(f'outputs/graphs_pred/{indx}.svg')
         else:
@@ -189,11 +197,12 @@ def estimate_graph(indx, polys, nodes, G_gt, ID_COLOR, draw_graph, save_svg):
         plt.close('all')
     return mistakes
 
+
 def save_samples(
-        sample, ext, model_kwargs, 
-        tmp_count, num_room_types, 
+        sample, ext, model_kwargs,
+        tmp_count, num_room_types,
         save_gif=False, save_edges=False,
-        door_indices = [11, 12, 13], ID_COLOR=None,
+        door_indices=[11, 12, 13], ID_COLOR=None,
         is_syn=False, draw_graph=False, save_svg=False):
     prefix = 'syn_' if is_syn else ''
     graph_errors = []
@@ -206,78 +215,100 @@ def save_samples(
         images3 = []
         for k in range(sample.shape[0]):
             draw = drawsvg.Drawing(resolution, resolution, displayInline=False)
-            draw.append(drawsvg.Rectangle(0,0,resolution,resolution, fill='black'))
+            draw.append(drawsvg.Rectangle(0, 0, resolution, resolution, fill='black'))
             draw2 = drawsvg.Drawing(resolution, resolution, displayInline=False)
-            draw2.append(drawsvg.Rectangle(0,0,resolution,resolution, fill='black'))
+            draw2.append(drawsvg.Rectangle(0, 0, resolution, resolution, fill='black'))
             draw3 = drawsvg.Drawing(resolution, resolution, displayInline=False)
-            draw3.append(drawsvg.Rectangle(0,0,resolution,resolution, fill='black'))
+            draw3.append(drawsvg.Rectangle(0, 0, resolution, resolution, fill='black'))
             draw_color = drawsvg.Drawing(resolution, resolution, displayInline=False)
-            draw_color.append(drawsvg.Rectangle(0,0,resolution,resolution, fill='white'))
+            draw_color.append(drawsvg.Rectangle(0, 0, resolution, resolution, fill='white'))
             polys = []
             types = []
             for j, point in (enumerate(sample[k][i])):
-                if model_kwargs[f'{prefix}src_key_padding_mask'][i][j]==1:
+                if model_kwargs[f'{prefix}src_key_padding_mask'][i][j] == 1:
                     continue
                 point = point.cpu().data.numpy()
-                if j==0:
+                if j == 0:
                     poly = []
-                if j>0 and (model_kwargs[f'{prefix}room_indices'][i, j]!=model_kwargs[f'{prefix}room_indices'][i, j-1]).any():
+                if j > 0 and (model_kwargs[f'{prefix}room_indices'][i, j] != model_kwargs[f'{prefix}room_indices'][
+                    i, j - 1]).any():
                     polys.append(poly)
                     types.append(c)
                     poly = []
                 pred_center = False
                 if pred_center:
-                    point = point/2 + 1
-                    point = point * resolution//2
+                    point = point / 2 + 1
+                    point = point * resolution // 2
                 else:
-                    point = point/2 + 0.5
+                    point = point / 2 + 0.5
                     point = point * resolution
                 poly.append((point[0], point[1]))
-                c = np.argmax(model_kwargs[f'{prefix}room_types'][i][j-1].cpu().numpy())
+                c = np.argmax(model_kwargs[f'{prefix}room_types'][i][j - 1].cpu().numpy())
             polys.append(poly)
             types.append(c)
             for poly, c in zip(polys, types):
-                if c in door_indices or c==0:
+                if c in door_indices or c == 0:
                     continue
                 room_type = c
                 c = webcolors.hex_to_rgb(ID_COLOR[c])
-                draw_color.append(drawsvg.Lines(*np.array(poly).flatten().tolist(), close=True, fill=ID_COLOR[room_type], fill_opacity=1.0, stroke='black', stroke_width=1))
-                draw.append(drawsvg.Lines(*np.array(poly).flatten().tolist(), close=True, fill='black', fill_opacity=0.0, stroke=webcolors.rgb_to_hex([int(x/2) for x in c]), stroke_width=0.5*(resolution/256)))
-                draw2.append(drawsvg.Lines(*np.array(poly).flatten().tolist(), close=True, fill=ID_COLOR[room_type], fill_opacity=1.0, stroke=webcolors.rgb_to_hex([int(x/2) for x in c]), stroke_width=0.5*(resolution/256)))
+                draw_color.append(
+                    drawsvg.Lines(*np.array(poly).flatten().tolist(), close=True, fill=ID_COLOR[room_type],
+                                  fill_opacity=1.0, stroke='black', stroke_width=1))
+                draw.append(
+                    drawsvg.Lines(*np.array(poly).flatten().tolist(), close=True, fill='black', fill_opacity=0.0,
+                                  stroke=webcolors.rgb_to_hex([int(x / 2) for x in c]),
+                                  stroke_width=0.5 * (resolution / 256)))
+                draw2.append(drawsvg.Lines(*np.array(poly).flatten().tolist(), close=True, fill=ID_COLOR[room_type],
+                                           fill_opacity=1.0, stroke=webcolors.rgb_to_hex([int(x / 2) for x in c]),
+                                           stroke_width=0.5 * (resolution / 256)))
                 for corner in poly:
-                    draw.append(drawsvg.Circle(corner[0], corner[1], 2*(resolution/256), fill=ID_COLOR[room_type], fill_opacity=1.0, stroke='gray', stroke_width=0.25))
-                    draw3.append(drawsvg.Circle(corner[0], corner[1], 2*(resolution/256), fill=ID_COLOR[room_type], fill_opacity=1.0, stroke='gray', stroke_width=0.25))
+                    draw.append(drawsvg.Circle(corner[0], corner[1], 2 * (resolution / 256), fill=ID_COLOR[room_type],
+                                               fill_opacity=1.0, stroke='gray', stroke_width=0.25))
+                    draw3.append(drawsvg.Circle(corner[0], corner[1], 2 * (resolution / 256), fill=ID_COLOR[room_type],
+                                                fill_opacity=1.0, stroke='gray', stroke_width=0.25))
             for poly, c in zip(polys, types):
                 if c not in door_indices:
                     continue
                 room_type = c
                 c = webcolors.hex_to_rgb(ID_COLOR[c])
-                draw_color.append(drawsvg.Lines(*np.array(poly).flatten().tolist(), close=True, fill=ID_COLOR[room_type], fill_opacity=1.0, stroke='black', stroke_width=1))
-                draw.append(drawsvg.Lines(*np.array(poly).flatten().tolist(), close=True, fill='black', fill_opacity=0.0, stroke=webcolors.rgb_to_hex([int(x/2) for x in c]), stroke_width=0.5*(resolution/256)))
-                draw2.append(drawsvg.Lines(*np.array(poly).flatten().tolist(), close=True, fill=ID_COLOR[room_type], fill_opacity=1.0, stroke=webcolors.rgb_to_hex([int(x/2) for x in c]), stroke_width=0.5*(resolution/256)))
+                draw_color.append(
+                    drawsvg.Lines(*np.array(poly).flatten().tolist(), close=True, fill=ID_COLOR[room_type],
+                                  fill_opacity=1.0, stroke='black', stroke_width=1))
+                draw.append(
+                    drawsvg.Lines(*np.array(poly).flatten().tolist(), close=True, fill='black', fill_opacity=0.0,
+                                  stroke=webcolors.rgb_to_hex([int(x / 2) for x in c]),
+                                  stroke_width=0.5 * (resolution / 256)))
+                draw2.append(drawsvg.Lines(*np.array(poly).flatten().tolist(), close=True, fill=ID_COLOR[room_type],
+                                           fill_opacity=1.0, stroke=webcolors.rgb_to_hex([int(x / 2) for x in c]),
+                                           stroke_width=0.5 * (resolution / 256)))
                 for corner in poly:
-                    draw.append(drawsvg.Circle(corner[0], corner[1], 2*(resolution/256), fill=ID_COLOR[room_type], fill_opacity=1.0, stroke='gray', stroke_width=0.25))
-                    draw3.append(drawsvg.Circle(corner[0], corner[1], 2*(resolution/256), fill=ID_COLOR[room_type], fill_opacity=1.0, stroke='gray', stroke_width=0.25))
+                    draw.append(drawsvg.Circle(corner[0], corner[1], 2 * (resolution / 256), fill=ID_COLOR[room_type],
+                                               fill_opacity=1.0, stroke='gray', stroke_width=0.25))
+                    draw3.append(drawsvg.Circle(corner[0], corner[1], 2 * (resolution / 256), fill=ID_COLOR[room_type],
+                                                fill_opacity=1.0, stroke='gray', stroke_width=0.25))
             images.append(Image.open(io.BytesIO(cairosvg.svg2png(draw.asSvg()))))
             images2.append(Image.open(io.BytesIO(cairosvg.svg2png(draw2.asSvg()))))
             images3.append(Image.open(io.BytesIO(cairosvg.svg2png(draw3.asSvg()))))
-            if k==sample.shape[0]-1 or True:
+            if k == sample.shape[0] - 1 or True:
                 if save_edges:
-                    draw.saveSvg(f'outputs/{ext}/{tmp_count+i}_{k}_{ext}.svg')
+                    draw.saveSvg(f'outputs/{ext}/{tmp_count + i}_{k}_{ext}.svg')
                 if save_svg:
-                    draw_color.saveSvg(f'outputs/{ext}/{tmp_count+i}c_{k}_{ext}.svg')
+                    draw_color.saveSvg(f'outputs/{ext}/{tmp_count + i}c_{k}_{ext}.svg')
                 else:
-                    Image.open(io.BytesIO(cairosvg.svg2png(draw_color.asSvg()))).save(f'outputs/{ext}/{tmp_count+i}c_{ext}.png')
-            if k==sample.shape[0]-1:
+                    Image.open(io.BytesIO(cairosvg.svg2png(draw_color.asSvg()))).save(
+                        f'outputs/{ext}/{tmp_count + i}c_{ext}.png')
+            if k == sample.shape[0] - 1:
                 if 'graph' in model_kwargs:
-                    graph_errors.append(estimate_graph(tmp_count+i, polys, types, model_kwargs[f'{prefix}graph'][i], ID_COLOR=ID_COLOR, draw_graph=draw_graph, save_svg=save_svg))
+                    graph_errors.append(estimate_graph(tmp_count + i, polys, types, model_kwargs[f'{prefix}graph'][i],
+                                                       ID_COLOR=ID_COLOR, draw_graph=draw_graph, save_svg=save_svg))
                 else:
                     graph_errors.append(0)
         if save_gif:
-            imageio.mimwrite(f'outputs/gif/{tmp_count+i}.gif', images, fps=10, loop=1)
-            imageio.mimwrite(f'outputs/gif/{tmp_count+i}_v2.gif', images2, fps=10, loop=1)
-            imageio.mimwrite(f'outputs/gif/{tmp_count+i}_v3.gif', images3, fps=10, loop=1)
+            imageio.mimwrite(f'outputs/gif/{tmp_count + i}.gif', images, fps=10, loop=1)
+            imageio.mimwrite(f'outputs/gif/{tmp_count + i}_v2.gif', images2, fps=10, loop=1)
+            imageio.mimwrite(f'outputs/gif/{tmp_count + i}_v3.gif', images3, fps=10, loop=1)
     return graph_errors
+
 
 def main():
     args = create_argparser().parse_args()
@@ -295,7 +326,7 @@ def main():
     )
     model.to(dist_util.dev())
     model.eval()
-
+    print(f"analog {args.analog_bit}")
     errors = []
     for _ in range(5):
         logger.log("sampling...")
@@ -306,16 +337,16 @@ def main():
         os.makedirs('outputs/graphs_gt', exist_ok=True)
         os.makedirs('outputs/graphs_pred', exist_ok=True)
 
-        if args.dataset=='rplan':
+        if args.dataset == 'rplan':
             ID_COLOR = {1: '#EE4D4D', 2: '#C67C7B', 3: '#FFD274', 4: '#BEBEBE', 5: '#BFE3E8',
                         6: '#7BA779', 7: '#E87A90', 8: '#FF8C69', 10: '#1F849B', 11: '#727171',
                         13: '#785A67', 12: '#D3A2C7'}
             num_room_types = 14
             data = load_rplanhg_data(
-                batch_size=args.batch_size,
+                batch_size=1,
                 analog_bit=args.analog_bit,
-                set_name=args.set_name,
-                target_set=args.target_set,
+                set_name='eval',
+                target_set=8,
             )
         else:
             print("dataset does not exist!")
@@ -327,9 +358,11 @@ def main():
                 diffusion.p_sample_loop if not args.use_ddim else diffusion.ddim_sample_loop
             )
             data_sample, model_kwargs = next(data)
-            for key in model_kwargs:
-                model_kwargs[key] = model_kwargs[key].cuda()
 
+            for key in model_kwargs:
+                print(f"{key} {model_kwargs[key].shape}")
+                model_kwargs[key] = model_kwargs[key].cuda()
+            print(f"Data Sample {data_sample.shape}")
             sample = sample_fn(
                 model,
                 data_sample.shape,
@@ -344,27 +377,30 @@ def main():
                 sample_gt = bin_to_int_sample(sample_gt)
                 sample = bin_to_int_sample(sample)
 
-            graph_error = save_samples(sample_gt, 'gt', model_kwargs, tmp_count, num_room_types, ID_COLOR=ID_COLOR, draw_graph=args.draw_graph, save_svg=args.save_svg)
-            graph_error = save_samples(sample, 'pred', model_kwargs, tmp_count, num_room_types, ID_COLOR=ID_COLOR, is_syn=True, draw_graph=args.draw_graph, save_svg=args.save_svg)
+            graph_error = save_samples(sample_gt, 'gt', model_kwargs, tmp_count, num_room_types, ID_COLOR=ID_COLOR,
+                                       draw_graph=args.draw_graph, save_svg=args.save_svg)
+            graph_error = save_samples(sample, 'pred', model_kwargs, tmp_count, num_room_types, ID_COLOR=ID_COLOR,
+                                       is_syn=True, draw_graph=args.draw_graph, save_svg=args.save_svg)
             graph_errors.extend(graph_error)
-            tmp_count+=sample_gt.shape[1]
+            tmp_count += sample_gt.shape[1]
         logger.log("sampling complete")
-        fid_score = calculate_fid_given_paths(['outputs/gt', 'outputs/pred'], 64, 'cuda', 2048)
-        print(f'FID: {fid_score}')
+        # fid_score = calculate_fid_given_paths(['outputs/gt', 'outputs/pred'], batch_size=1, device='cuda', dims=2048)
+        # print(f'FID: {fid_score}')
         print(f'Compatibility: {np.mean(graph_errors)}')
-        errors.append([fid_score, np.mean(graph_errors)])
+        # errors.append([fid_score, np.mean(graph_errors)])
     errors = np.array(errors)
     print(f'Diversity mean: {errors[:, 0].mean()} \t Diversity std: {errors[:, 0].std()}')
     print(f'Compatibility mean: {errors[:, 1].mean()} \t Compatibility std: {errors[:, 1].std()}')
 
+
 def create_argparser():
     defaults = dict(
-        dataset='',
+        dataset='rplan',
         clip_denoised=True,
-        num_samples=10000,
-        batch_size=16,
+        num_samples=1,
+        batch_size=1,
         use_ddim=False,
-        model_path="",
+        model_path="/home/akmal/APIIT/FYP Code/house_diffusion/ckpts/exp/model250000.pt",
         draw_graph=True,
         save_svg=True,
     )

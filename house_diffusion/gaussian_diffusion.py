@@ -260,7 +260,7 @@ class GaussianDiffusion:
 
         B, C = x.shape[:2]
         assert t.shape == (B,)
-        xtalpha = _extract_into_tensor(self.sqrt_recip_alphas_cumprod, t, x.shape).permute([0,2,1])
+        xtalpha = _extract_into_tensor(self.sqrt_recip_alphas_cumprod, t, x.shape).permute([0, 2, 1])
         epsalpha = _extract_into_tensor(self.sqrt_recipm1_alphas_cumprod, t, x.shape).permute([0,2,1])
         model_output_dec, model_output_bin = model(x, self._scale_timesteps(t), xtalpha=xtalpha, epsalpha=epsalpha, is_syn=True, **model_kwargs)
         model_output = model_output_dec

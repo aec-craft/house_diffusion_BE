@@ -1,0 +1,12 @@
+1 Red
+2 Light Red
+3 Yellow
+4 Grey
+5 Light Blue
+6 Green
+7 Pink
+8 Orange
+10 Blue
+11 Dark Grey
+12 Purple
+13 Dark Pink
