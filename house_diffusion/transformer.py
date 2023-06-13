@@ -228,7 +228,7 @@ class TransformerModel(nn.Module):
         """
         Apply the model to an input batch.
 
-        :param x: an [N x S x C] Tensor of inputs.
+        param x: an [N x S x C] Tensor of inputs.
         :param timesteps: a 1-D batch of timesteps.
         :param y: an [N] Tensor of labels, if class-conditional.
         :return: an [N x S x C] Tensor of outputs.

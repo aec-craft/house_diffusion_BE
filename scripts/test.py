@@ -14,6 +14,7 @@ from house_diffusion.script_util import (
     args_to_dict,
     update_arg_parser,
 )
+from random import randint
 
 
 def create_argparser():
@@ -25,7 +26,7 @@ def create_argparser():
         use_ddim=False,
         model_path="/home/akmal/APIIT/FYP Code/house_diffusion/ckpts/exp/model250000.pt",
         draw_graph=False,
-        save_svg=False,
+        save_svg=True,
     )
     defaults.update(model_and_diffusion_defaults())
     parser = argparse.ArgumentParser()
@@ -33,7 +34,7 @@ def create_argparser():
     return parser
 
 
-def create_layout(filename):
+def create_layout(filename, corner_dict=None):
     args = create_argparser().parse_args()
     update_arg_parser(args)
 
@@ -53,34 +54,44 @@ def create_layout(filename):
                 13: '#785A67', 12: '#D3A2C7'}
     num_room_types = 14
     sample_fn = (diffusion.p_sample_loop if not args.use_ddim else diffusion.ddim_sample_loop)
-    data_sample, model_kwargs = function_test(filename)
+    data_sample, model_kwargs = function_test(filename, corner_dict)
 
     data_sample = th.from_numpy(np.array([data_sample]))
     for key in model_kwargs:
         model_kwargs[key] = th.from_numpy(np.array([model_kwargs[key]])).cuda()
 
-    sample = sample_fn(
-        model,
-        data_sample.shape,
-        clip_denoised=args.clip_denoised,
-        model_kwargs=model_kwargs,
-        analog_bit=args.analog_bit,
-    )
+    for count in range(5):
+        sample = sample_fn(
+            model,
+            data_sample.shape,
+            clip_denoised=args.clip_denoised,
+            model_kwargs=model_kwargs,
+            analog_bit=args.analog_bit,
+        )
 
-    sample_gt = data_sample.cuda().unsqueeze(0)
-    sample = sample.permute([0, 1, 3, 2])
-    sample_gt = sample_gt.permute([0, 1, 3, 2])
-    if args.analog_bit:
-        sample_gt = bin_to_int_sample(sample_gt)
-        sample = bin_to_int_sample(sample)
+        sample_gt = data_sample.cuda().unsqueeze(0)
+        sample = sample.permute([0, 1, 3, 2])
+        sample_gt = sample_gt.permute([0, 1, 3, 2])
+        if args.analog_bit:
+            sample_gt = bin_to_int_sample(sample_gt)
+            sample = bin_to_int_sample(sample)
 
-    gt = save_samples(sample_gt, 'test', model_kwargs, 14, num_room_types, ID_COLOR=ID_COLOR,
-                      draw_graph=args.draw_graph, save_svg=args.save_svg)
-    pred = save_samples(sample, 'test', model_kwargs, 14, num_room_types, ID_COLOR=ID_COLOR,
-                        is_syn=True, draw_graph=args.draw_graph, save_svg=args.save_svg)
+        gt = save_samples(sample_gt, 'test', model_kwargs, count, num_room_types, ID_COLOR=ID_COLOR,
+                          draw_graph=args.draw_graph, save_svg=args.save_svg)
+        pred = save_samples(sample, 'test', model_kwargs, count, num_room_types, ID_COLOR=ID_COLOR,
+                            is_syn=True, draw_graph=args.draw_graph, save_svg=args.save_svg)
 
 
-ROOM_CLASS = {"living_room": 1, "kitchen": 2, "bedroom": 3, "bathroom": 2}
+room_count = {"living_room": 1, "kitchen": 1, "bedroom": 2, "bathroom": 1}
+corners = {"living_room": [21], "kitchen": [4], "bedroom": [4], "bathroom": [7]}
+ROOM_CLASS = {"living_room": 1, "kitchen": 2, "bedroom": 3, "bathroom": 4}
 
-mongo_dataset = MongoDataset.objects(**ROOM_CLASS)
-create_layout('/home/akmal/APIIT/FYP Code/house_diffusion/datasets/rplan/16004.json')
+for x in ROOM_CLASS.keys():
+    corners[ROOM_CLASS[x]] = corners[x]
+    corners.pop(x)
+
+
+mongo_dataset = MongoDataset.objects(**room_count).first()
+gt_layout = mongo_dataset
+data = {"room_type": gt_layout.room_type, "boxes": gt_layout.boxes, "edges": gt_layout.edges, "ed_rm": gt_layout.ed_rm}
+create_layout(data, corners)

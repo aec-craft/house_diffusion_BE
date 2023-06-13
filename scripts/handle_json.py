@@ -3,9 +3,10 @@ from scripts.creation_utils import build_graph
 import numpy as np
 import cv2 as cv
 import random
+# from house_diffusion.rplanhg_datasets import reader
 
 
-def function_test(info):
+def function_test(info, corner_dict=None):
     rms_type, fp_eds, rms_bbs, eds_to_rms = reader(info)
     fp_size = len([x for x in rms_type if x != 15 and x != 17])
     graph = [rms_type, rms_bbs, fp_eds, eds_to_rms]
@@ -98,6 +99,8 @@ def function_test(info):
     corner_bounds = []
     num_points = 0
     print(f"Corner Number{cnumber_dist}")
+    if corner_dict is not None:
+        cnumber_dist.update(corner_dict)
 
     num_room_corners_total = [cnumber_dist[room[1]][random.randint(0, len(cnumber_dist[room[1]]) - 1)]
                                               for room in org_houses]

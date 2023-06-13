@@ -18,20 +18,20 @@ class MongoDataset(Document):
     study_room = IntField(required=False)
     storage = IntField(required=False)
     room_type = ListField(IntField(), default=[])
-    boxes = ListField(ListField(FloatField()), default=[])
-    edges = ListField(ListField(FloatField()), default=[])
-    ed_rm = ListField(ListField(FloatField()), default=[])
+    boxes = ListField(ListField(IntField()), default=[])
+    edges = ListField(ListField(IntField()), default=[])
+    ed_rm = ListField(ListField(IntField()), default=[])
 
 
-with open('/home/akmal/APIIT/FYP Code/house_diffusion/list.txt') as f:
-    lines = f.readlines()
-
-for line in tqdm(lines):
-    file_name = f'{base_dir}/{line[:-1]}'
-    with open(file_name) as f:
-        info = json.load(f)
-        ROOM_CLASS = {"living_room": info['room_type'].count(1), "kitchen": info['room_type'].count(2), "bedroom": info['room_type'].count(3), "bathroom": info['room_type'].count(4), "balcony": info['room_type'].count(5),
-                      "dining_room": info['room_type'].count(7), "study_room": info['room_type'].count(8), "storage": info['room_type'].count(10)}
-        info.update(ROOM_CLASS)
-        mongo_dataset = MongoDataset(**info)
-        mongo_dataset.save()
+# with open('/home/akmal/APIIT/FYP Code/house_diffusion/list.txt') as f:
+#     lines = f.readlines()
+#
+# for line in tqdm(lines):
+#     file_name = f'{base_dir}/{line[:-1]}'
+#     with open(file_name) as f:
+#         info = json.load(f)
+#         ROOM_CLASS = {"living_room": info['room_type'].count(1), "kitchen": info['room_type'].count(2), "bedroom": info['room_type'].count(3), "bathroom": info['room_type'].count(4), "balcony": info['room_type'].count(5),
+#                       "dining_room": info['room_type'].count(7), "study_room": info['room_type'].count(8), "storage": info['room_type'].count(10)}
+#         info.update(ROOM_CLASS)
+#         mongo_dataset = MongoDataset(**info)
+#         mongo_dataset.save()

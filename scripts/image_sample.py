@@ -360,9 +360,8 @@ def main():
             data_sample, model_kwargs = next(data)
 
             for key in model_kwargs:
-                print(f"{key} {model_kwargs[key].shape}")
                 model_kwargs[key] = model_kwargs[key].cuda()
-            print(f"Data Sample {data_sample.shape}")
+
             sample = sample_fn(
                 model,
                 data_sample.shape,
@@ -384,10 +383,10 @@ def main():
             graph_errors.extend(graph_error)
             tmp_count += sample_gt.shape[1]
         logger.log("sampling complete")
-        # fid_score = calculate_fid_given_paths(['outputs/gt', 'outputs/pred'], batch_size=1, device='cuda', dims=2048)
-        # print(f'FID: {fid_score}')
+        fid_score = calculate_fid_given_paths(['outputs/gt', 'outputs/pred'], batch_size=1, device='cuda', dims=2048)
+        print(f'FID: {fid_score}')
         print(f'Compatibility: {np.mean(graph_errors)}')
-        # errors.append([fid_score, np.mean(graph_errors)])
+        errors.append([fid_score, np.mean(graph_errors)])
     errors = np.array(errors)
     print(f'Diversity mean: {errors[:, 0].mean()} \t Diversity std: {errors[:, 0].std()}')
     print(f'Compatibility mean: {errors[:, 1].mean()} \t Compatibility std: {errors[:, 1].std()}')
@@ -401,8 +400,8 @@ def create_argparser():
         batch_size=1,
         use_ddim=False,
         model_path="/home/akmal/APIIT/FYP Code/house_diffusion/ckpts/exp/model250000.pt",
-        draw_graph=True,
-        save_svg=True,
+        draw_graph=False,
+        save_svg=False,
     )
     defaults.update(model_and_diffusion_defaults())
     parser = argparse.ArgumentParser()
