@@ -18,7 +18,6 @@ from .resample import LossAwareSampler, UniformSampler
 # 20-21 within the first ~1K steps of training.
 INITIAL_LOG_LOSS_SCALE = 20.0
 
-
 class TrainLoop:
     def __init__(
         self,
@@ -62,7 +61,7 @@ class TrainLoop:
         self.lr_anneal_steps = lr_anneal_steps
 
         self.step = 0
-        self.resume_step = 0
+        self.resume_step = 10000
         self.global_batch = self.batch_size * dist.get_world_size()
 
         self.sync_cuda = th.cuda.is_available()

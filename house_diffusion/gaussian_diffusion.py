@@ -64,7 +64,6 @@ def betas_for_alpha_bar(num_diffusion_timesteps, alpha_bar, max_beta=0.999):
         betas.append(min(1 - alpha_bar(t2) / alpha_bar(t1), max_beta))
     return np.array(betas)
 
-
 class ModelMeanType(enum.Enum):
     """
     Which type of output the model predicts.
@@ -261,7 +260,7 @@ class GaussianDiffusion:
         B, C = x.shape[:2]
         assert t.shape == (B,)
         xtalpha = _extract_into_tensor(self.sqrt_recip_alphas_cumprod, t, x.shape).permute([0, 2, 1])
-        epsalpha = _extract_into_tensor(self.sqrt_recipm1_alphas_cumprod, t, x.shape).permute([0,2,1])
+        epsalpha = _extract_into_tensor(self.sqrt_recipm1_alphas_cumprod, t, x.shape).permute([0, 2, 1])
         model_output_dec, model_output_bin = model(x, self._scale_timesteps(t), xtalpha=xtalpha, epsalpha=epsalpha, is_syn=True, **model_kwargs)
         model_output = model_output_dec
 

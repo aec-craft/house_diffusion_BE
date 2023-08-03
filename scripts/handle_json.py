@@ -159,7 +159,6 @@ def function_test(info, corner_dict=None):
     syn_door_masks = door_mask
     syn_self_masks = self_mask
     syn_gen_masks = gen_mask
-    syn_graphs = graphs
 
     arr = houses[:, :2]
 

@@ -115,7 +115,7 @@ def create_gaussian_diffusion(
         steps=1000,
         learn_sigma=False,
         sigma_small=False,
-        noise_schedule="linear",
+        noise_schedule="cosine",
         use_kl=False,
         predict_xstart=False,
         rescale_timesteps=False,
