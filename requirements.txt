@@ -8,7 +8,7 @@ matplotlib==3.5.1
 mongoengine==0.27.0
 mpi4py==3.1.4
 networkx==2.8.2
-numpy==1.21.5
+numpy==1.22.0
 opencv_python==4.6.0.66
 pandas==2.0.3
 Pillow==10.0.0
