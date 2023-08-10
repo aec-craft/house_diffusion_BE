@@ -3,6 +3,7 @@ FROM python:3.10.12
 WORKDIR app
 
 RUN apt-get update && apt-get install -y libopenmpi-dev
+RUN apt-get update && apt-get install ffmpeg libsm6 libxext6  -y
 COPY scripts ./scripts
 COPY house_diffusion ./house_diffusion
 COPY utils ./utils
