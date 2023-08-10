@@ -16,7 +16,7 @@ pydantic==2.1.1
 pytorch_fid==0.3.0
 setuptools==57.5.0
 Shapely==1.8.4
-starlette==0.31.0
+starlette===0.27.0
 tensorflow==2.12.0
 torch==2.0.1
 tqdm==4.61.2
