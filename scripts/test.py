@@ -34,7 +34,7 @@ def create_argparser():
     return parser
 
 
-def create_layout(filename, corner_dict=None):
+def create_layout(graphs, corners, room_type):
     args = create_argparser().parse_args()
     update_arg_parser(args)
 
@@ -54,16 +54,12 @@ def create_layout(filename, corner_dict=None):
                 13: '#785A67', 12: '#D3A2C7'}
     num_room_types = 14
     sample_fn = (diffusion.p_sample_loop if not args.use_ddim else diffusion.ddim_sample_loop)
-    data_sample, model_kwargs = function_test(filename, corner_dict)
-    data_sample = th.from_numpy(np.array([data_sample]))
-    keys = ['door_mask', 'self_mask', 'gen_mask', 'room_types', 'corner_indices', 'room_indices', 'src_key_padding_mask', 'connections', 'graph']
-    for x in keys:
-        model_kwargs.pop(x)
-
+    model_kwargs = function_test(graphs, corners, room_type)
     for key in model_kwargs:
         model_kwargs[key] = th.from_numpy(np.array([model_kwargs[key]])).cuda()
 
-    for count in range(5):
+    data_uri = []
+    for count in range(1):
         sample = sample_fn(
             model,
             th.Size([1, 2, 100]),
@@ -79,17 +75,20 @@ def create_layout(filename, corner_dict=None):
         pred = save_samples(sample, 'test', model_kwargs, count, num_room_types, ID_COLOR=ID_COLOR,
                             is_syn=True, draw_graph=args.draw_graph, save_svg=args.save_svg)
 
+        data_uri.append(pred)
 
-room_count = {"living_room": 1, "kitchen": 1, "bedroom": 2, "bathroom": 1}
-corners = {}
-ROOM_CLASS = {"living_room": 1, "kitchen": 2, "bedroom": 3, "bathroom": 4}
+    return data_uri
 
-# for x in ROOM_CLASS.keys():
-#     corners[ROOM_CLASS[x]] = corners[x]
-#     corners.pop(x)
-
-
-mongo_dataset = MongoDataset.objects(**room_count).first()
-gt_layout = mongo_dataset
-data = {"room_type": gt_layout.room_type, "boxes": gt_layout.boxes, "edges": gt_layout.edges, "ed_rm": gt_layout.ed_rm}
-create_layout(data, corners)
+# room_count = {"living_room": 1, "kitchen": 1, "bedroom": 2, "bathroom": 1}
+# corners = {}
+# ROOM_CLASS = {"living_room": 1, "kitchen": 2, "bedroom": 3, "bathroom": 4}
+#
+# # for x in ROOM_CLASS.keys():
+# #     corners[ROOM_CLASS[x]] = corners[x]
+# #     corners.pop(x)
+#
+#
+# mongo_dataset = MongoDataset.objects(**room_count).first()
+# gt_layout = mongo_dataset
+# data = {"room_type": gt_layout.room_type, "boxes": gt_layout.boxes, "edges": gt_layout.edges, "ed_rm": gt_layout.ed_rm}
+# create_layout(data, corners)

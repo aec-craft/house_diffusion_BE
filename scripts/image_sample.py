@@ -230,8 +230,7 @@ def save_samples(
                 point = point.cpu().data.numpy()
                 if j == 0:
                     poly = []
-                if j > 0 and (model_kwargs[f'{prefix}room_indices'][i, j] != model_kwargs[f'{prefix}room_indices'][
-                    i, j - 1]).any():
+                if j > 0 and (model_kwargs[f'{prefix}room_indices'][i, j] != model_kwargs[f'{prefix}room_indices'][i, j - 1]).any():
                     polys.append(poly)
                     types.append(c)
                     poly = []
@@ -293,7 +292,7 @@ def save_samples(
                 if save_edges:
                     draw.saveSvg(f'outputs/{ext}/{tmp_count + i}_{k}_{ext}.svg')
                 if save_svg:
-                    draw_color.saveSvg(f'outputs/{ext}/{tmp_count + i}c_{k}_{ext}.svg')
+                    draw_color.saveSvg(f'//home/akmal/APIIT/FYP Code/house_diffusion/scripts/outputs/test/{tmp_count + i}_layout.svg')
                 else:
                     Image.open(io.BytesIO(cairosvg.svg2png(draw_color.asSvg()))).save(
                         f'outputs/{ext}/{tmp_count + i}c_{ext}.png')
@@ -307,7 +306,8 @@ def save_samples(
             imageio.mimwrite(f'outputs/gif/{tmp_count + i}.gif', images, fps=10, loop=1)
             imageio.mimwrite(f'outputs/gif/{tmp_count + i}_v2.gif', images2, fps=10, loop=1)
             imageio.mimwrite(f'outputs/gif/{tmp_count + i}_v3.gif', images3, fps=10, loop=1)
-    return graph_errors
+
+    return draw_color.asDataUri()
 
 
 def main():
