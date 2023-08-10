@@ -3,7 +3,7 @@ import os
 import csv
 import codecs
 import time
-
+import uvicorn
 
 import numpy as np
 from fastapi import FastAPI, File, UploadFile
@@ -53,7 +53,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-ROOM_CLASS = {'Living Room': 1, 'Kitchen': 2, 'Bedroom': 3, 'Bathroom': 4, 'Balcony': 5, 'Entrance': 6, 'Dining Room': 7,
+ROOM_CLASS = {'Living Room': 1, 'Kitchen': 2, 'Bedroom': 3, 'Bathroom': 4, 'Balcony': 5, 'Entrance': 6,
+              'Dining Room': 7,
               'Study Room': 8, 'Storage': 10, 'Front Door': 11, 'Unknown': 13, 'Interior Door': 12}
 
 
@@ -108,7 +109,12 @@ async def generate(house_graph: HouseGraph):
     return {"dataUri": data_uri}
 
 
-url = 'https://drive.google.com/u/1/uc?id=16zKmtxwY5lF6JE-CJGkRf3-OFoD1TrdR&export=download'
-output = 'scripts/model.pt'
-if not os.path.isfile(output):
-    gdown.download(url, output, quiet=False)
+if __name__ == "__main__":
+    url = 'https://drive.google.com/u/1/uc?id=16zKmtxwY5lF6JE-CJGkRf3-OFoD1TrdR&export=download'
+    output = 'scripts/model.pt'
+    if not os.path.isfile(output):
+        gdown.download(url, output, quiet=False)
+
+    if uvicorn.run(app, host="0.0.0.0", port=8080):
+        print("Service started")
+        pass
