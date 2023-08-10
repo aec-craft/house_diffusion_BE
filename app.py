@@ -4,7 +4,6 @@ import csv
 import codecs
 import time
 
-import uvicorn
 
 import numpy as np
 from fastapi import FastAPI, File, UploadFile
@@ -105,8 +104,3 @@ async def generate(house_graph: HouseGraph):
     data_uri = create_layout(edges, room_corners, room_list)
     return {"dataUri": data_uri}
 
-
-if __name__ == "__main__":
-    if uvicorn.run(app, host="0.0.0.0", port=8080):
-        print("Service started")
-        pass
