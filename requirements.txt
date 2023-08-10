@@ -22,3 +22,4 @@ torch==2.0.1
 tqdm==4.61.2
 uvicorn==0.23.2
 webcolors==1.12
+gdown==4.7.1

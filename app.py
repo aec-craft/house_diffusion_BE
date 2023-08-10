@@ -13,6 +13,9 @@ from typing import List, Optional
 from starlette.requests import Request
 from fastapi.middleware.cors import CORSMiddleware
 from scripts.test import create_layout
+import os.path
+
+import gdown
 
 
 class Nodes(BaseModel):
@@ -104,3 +107,8 @@ async def generate(house_graph: HouseGraph):
     data_uri = create_layout(edges, room_corners, room_list)
     return {"dataUri": data_uri}
 
+
+url = 'https://drive.google.com/u/1/uc?id=16zKmtxwY5lF6JE-CJGkRf3-OFoD1TrdR&export=download'
+output = 'scripts/model.pt'
+if not os.path.isfile(output):
+    gdown.download(url, output, quiet=False)

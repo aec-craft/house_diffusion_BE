@@ -24,7 +24,7 @@ def create_argparser():
         num_samples=1,
         batch_size=1,
         use_ddim=False,
-        model_path="/home/akmal/APIIT/FYP Code/house_diffusion/ckpts/exp/model250000.pt",
+        model_path="scripts/model.pt",
         draw_graph=False,
         save_svg=True,
     )
