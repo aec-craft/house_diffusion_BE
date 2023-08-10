@@ -16,3 +16,4 @@ slurm-*
 embedder/ckpts
 /venv
 .idea/
+/ckpts/exp
