@@ -110,11 +110,6 @@ async def generate(house_graph: HouseGraph):
 
 
 if __name__ == "__main__":
-    url = 'https://drive.google.com/u/1/uc?id=16zKmtxwY5lF6JE-CJGkRf3-OFoD1TrdR&export=download'
-    output = 'scripts/model.pt'
-    if not os.path.isfile(output):
-        gdown.download(url, output, quiet=False)
-
     if uvicorn.run(app, host="0.0.0.0", port=8080):
         print("Service started")
         pass

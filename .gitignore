@@ -17,3 +17,4 @@ embedder/ckpts
 /venv
 .idea/
 /ckpts/exp
+/scripts/ckpts

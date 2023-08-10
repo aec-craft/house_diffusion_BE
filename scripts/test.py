@@ -1,4 +1,3 @@
-import argparse
 import os
 
 import numpy as np
@@ -13,38 +12,17 @@ from house_diffusion.script_util import (
     args_to_dict,
     update_arg_parser,
 )
+import gdown
 from random import randint
 
 
-def create_argparser():
-    defaults = dict(
-        dataset='rplan',
-        clip_denoised=True,
-        num_samples=1,
-        batch_size=1,
-        use_ddim=False,
-        model_path="scripts/model.pt",
-        draw_graph=False,
-        save_svg=True,
-    )
-    defaults.update(model_and_diffusion_defaults())
-    parser = argparse.ArgumentParser()
-    add_dict_to_argparser(parser, defaults)
-    return parser
-
-
 def create_layout(graphs, corners, room_type):
-    args = create_argparser().parse_args()
-    update_arg_parser(args)
-
     dist_util.setup_dist()
     logger.configure()
     logger.log("creating model and diffusion...")
-    model, diffusion = create_model_and_diffusion(
-        **args_to_dict(args, model_and_diffusion_defaults().keys())
-    )
+    model, diffusion = create_model_and_diffusion()
     model.load_state_dict(
-        dist_util.load_state_dict(args.model_path, map_location="cpu")
+        dist_util.load_state_dict("scripts/model.pt", map_location="cpu")
     )
     model.to(dist_util.dev())
     model.eval()
@@ -52,7 +30,7 @@ def create_layout(graphs, corners, room_type):
                 6: '#7BA779', 7: '#E87A90', 8: '#FF8C69', 10: '#1F849B', 11: '#727171',
                 13: '#785A67', 12: '#D3A2C7'}
     num_room_types = 14
-    sample_fn = (diffusion.p_sample_loop if not args.use_ddim else diffusion.ddim_sample_loop)
+    sample_fn = (diffusion.p_sample_loop if not False else diffusion.ddim_sample_loop)
     model_kwargs = function_test(graphs, corners, room_type)
     for key in model_kwargs:
         model_kwargs[key] = th.from_numpy(np.array([model_kwargs[key]])).cuda()
@@ -62,19 +40,22 @@ def create_layout(graphs, corners, room_type):
         sample = sample_fn(
             model,
             th.Size([1, 2, 100]),
-            clip_denoised=args.clip_denoised,
+            clip_denoised=True,
             model_kwargs=model_kwargs,
-            analog_bit=args.analog_bit,
+            analog_bit=False,
         )
 
         sample = sample.permute([0, 1, 3, 2])
-        if args.analog_bit:
-            sample = bin_to_int_sample(sample)
 
         pred = save_samples(sample, 'test', model_kwargs, count, num_room_types, ID_COLOR=ID_COLOR,
-                            is_syn=True, draw_graph=args.draw_graph, save_svg=args.save_svg)
+                            is_syn=True, draw_graph=False, save_svg=True)
 
         data_uri.append(pred)
 
     return data_uri
 
+
+url = 'https://drive.google.com/u/1/uc?id=16zKmtxwY5lF6JE-CJGkRf3-OFoD1TrdR&export=download'
+output = 'scripts/model.pt'
+if not os.path.isfile(output):
+    gdown.download(url, output, quiet=False)
