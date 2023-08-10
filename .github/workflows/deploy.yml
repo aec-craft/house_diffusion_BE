@@ -17,7 +17,7 @@ jobs:
     - name: Login to Docker Hub
       env:
         DOCKERPASS: ${{ secrets.DOCKERPASS }}
-      run: echo $DOCKERPASS | docker login -u USERNAME --password-stdin
+      run: echo $DOCKERPASS | docker login -u sakmalh --password-stdin
 
     - name: Push Docker image
       run: docker push sakmalh/bk-diffusion
