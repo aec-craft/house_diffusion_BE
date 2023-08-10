@@ -3,7 +3,6 @@ import os
 
 import numpy as np
 import torch as th
-from utils.transfer_db import MongoDataset
 from scripts.image_sample import bin_to_int_sample, save_samples
 from scripts.handle_json import function_test
 from house_diffusion import dist_util, logger
@@ -79,16 +78,3 @@ def create_layout(graphs, corners, room_type):
 
     return data_uri
 
-# room_count = {"living_room": 1, "kitchen": 1, "bedroom": 2, "bathroom": 1}
-# corners = {}
-# ROOM_CLASS = {"living_room": 1, "kitchen": 2, "bedroom": 3, "bathroom": 4}
-#
-# # for x in ROOM_CLASS.keys():
-# #     corners[ROOM_CLASS[x]] = corners[x]
-# #     corners.pop(x)
-#
-#
-# mongo_dataset = MongoDataset.objects(**room_count).first()
-# gt_layout = mongo_dataset
-# data = {"room_type": gt_layout.room_type, "boxes": gt_layout.boxes, "edges": gt_layout.edges, "ed_rm": gt_layout.ed_rm}
-# create_layout(data, corners)
