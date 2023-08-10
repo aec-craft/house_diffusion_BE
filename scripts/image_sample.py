@@ -292,7 +292,8 @@ def save_samples(
                 if save_edges:
                     draw.saveSvg(f'outputs/{ext}/{tmp_count + i}_{k}_{ext}.svg')
                 if save_svg:
-                    draw_color.saveSvg(f'//home/akmal/APIIT/FYP Code/house_diffusion/scripts/outputs/test/{tmp_count + i}_layout.svg')
+                    pass
+                    # draw_color.saveSvg(f'//home/akmal/APIIT/FYP Code/house_diffusion/scripts/outputs/test/{tmp_count + i}_layout.svg')
                 else:
                     Image.open(io.BytesIO(cairosvg.svg2png(draw_color.asSvg()))).save(
                         f'outputs/{ext}/{tmp_count + i}c_{ext}.png')
