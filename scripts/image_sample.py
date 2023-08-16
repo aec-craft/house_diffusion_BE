@@ -203,7 +203,7 @@ def save_samples(
         tmp_count, num_room_types,
         save_gif=False, save_edges=False,
         door_indices=[11, 12, 13], ID_COLOR=None,
-        is_syn=False, draw_graph=False, save_svg=False):
+        is_syn=False, draw_graph=False, save_svg=False, metrics=False):
     prefix = 'syn_' if is_syn else ''
     graph_errors = []
     if not save_gif:
@@ -250,6 +250,105 @@ def save_samples(
                     continue
                 room_type = c
                 c = webcolors.hex_to_rgb(ID_COLOR[c])
+                line_lengths = [np.linalg.norm(np.array(poly[i]) - np.array(poly[(i + 1) % len(poly)])) for i in
+                                range(len(poly))]
+
+                if metrics:
+                    text_size = 5
+                    for z, length in enumerate(line_lengths):
+                        # Calculate the mid-point of the line segment
+                        midpoint = ((poly[z][0] + poly[(z + 1) % len(poly)][0]) / 2,
+                                    (poly[z][1] + poly[(z + 1) % len(poly)][1]) / 2)
+
+                        # Calculate x and y differences
+                        x_diff = poly[z][0] - poly[(z + 1) % len(poly)][0]
+                        y_diff = poly[z][1] - poly[(z + 1) % len(poly)][1]
+
+                        # Determine text position adjustments based on differences
+                        if int(y_diff) != 0:
+                            if y_diff > 0:
+                                text_x = midpoint[0] + text_size
+                                text_y = midpoint[1]
+
+                                draw_color.append(drawsvg.Line(
+                                    text_x, text_y + text_size,  # Start point at the text label
+                                    poly[z][0] + text_size, poly[z][1],  # End point at the polygon endpoint
+                                    stroke='black',
+                                    stroke_width=1
+                                ))
+
+                                draw_color.append(drawsvg.Line(
+                                    text_x, text_y - text_size,  # Start point at the text label
+                                    poly[(z + 1) % len(poly)][0] + text_size, poly[(z + 1) % len(poly)][1],  # End point at the polygon endpoint
+                                    stroke='black',
+                                    stroke_width=1
+                                ))
+                            else:
+                                text_x = midpoint[0] - text_size
+                                text_y = midpoint[1]
+
+                                draw_color.append(drawsvg.Line(
+                                    text_x, text_y - text_size,  # Start point at the text label
+                                    poly[z][0] - text_size, poly[z][1],  # End point at the polygon endpoint
+                                    stroke='black',
+                                    stroke_width=1
+                                ))
+
+                                draw_color.append(drawsvg.Line(
+                                    text_x, text_y + text_size,  # Start point at the text label
+                                    poly[(z + 1) % len(poly)][0] - text_size, poly[(z + 1) % len(poly)][1],  # End point at the polygon endpoint
+                                    stroke='black',
+                                    stroke_width=1
+                                ))
+                        else:
+                            if x_diff > 0:
+                                text_x = midpoint[0]
+                                text_y = midpoint[1] - text_size
+
+                                draw_color.append(drawsvg.Line(
+                                    text_x + text_size, text_y,  # Start point at the text label
+                                    poly[z][0], poly[z][1] - text_size,  # End point at the polygon endpoint
+                                    stroke='black',
+                                    stroke_width=1
+                                ))
+
+                                draw_color.append(drawsvg.Line(
+                                    text_x - text_size, text_y,  # Start point at the text label
+                                    poly[(z + 1) % len(poly)][0], poly[(z + 1) % len(poly)][1] - text_size,  # End point at the polygon endpoint
+                                    stroke='black',
+                                    stroke_width=1
+                                ))
+                            else:
+                                text_x = midpoint[0]
+                                text_y = midpoint[1] + text_size
+
+                                draw_color.append(drawsvg.Line(
+                                    text_x - text_size, text_y,  # Start point at the text label
+                                    poly[z][0], poly[z][1] + text_size,  # End point at the polygon endpoint
+                                    stroke='black',
+                                    stroke_width=1
+                                ))
+
+                                draw_color.append(drawsvg.Line(
+                                    text_x + text_size, text_y,  # Start point at the text label
+                                    poly[(z + 1) % len(poly)][0], poly[(z + 1) % len(poly)][1] + text_size,  # End point at the polygon endpoint
+                                    stroke='black',
+                                    stroke_width=1
+                                ))
+
+
+                        # Add the text label to the SVG
+                        draw_color.append(
+                            drawsvg.Text(
+                                f'{int(abs(length))}',  # Format the length to two decimal places
+                                text_size,
+                                text_x, text_y,
+                                fill='black',
+                                text_anchor='middle',
+                                alignment_baseline='middle'
+                            )
+                        )
+
                 draw_color.append(
                     drawsvg.Lines(*np.array(poly).flatten().tolist(), close=True, fill=ID_COLOR[room_type],
                                   fill_opacity=1.0, stroke='black', stroke_width=1))

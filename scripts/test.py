@@ -16,7 +16,7 @@ import gdown
 from random import randint
 
 
-def create_layout(graphs, corners, room_type):
+def create_layout(graphs, corners, room_type, metrics=False):
     dist_util.setup_dist()
     logger.configure()
     logger.log("creating model and diffusion...")
@@ -48,7 +48,7 @@ def create_layout(graphs, corners, room_type):
         sample = sample.permute([0, 1, 3, 2])
 
         pred = save_samples(sample, 'test', model_kwargs, count, num_room_types, ID_COLOR=ID_COLOR,
-                            is_syn=True, draw_graph=False, save_svg=True)
+                            is_syn=True, draw_graph=False, save_svg=True, metrics=metrics)
 
         data_uri.append(pred)
 

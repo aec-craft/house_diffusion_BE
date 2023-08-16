@@ -33,6 +33,7 @@ class Edges(BaseModel):
 class HouseGraph(BaseModel):
     nodes: List[Nodes]
     edges: List[Edges]
+    metrics: bool
 
 
 app = FastAPI()
@@ -105,7 +106,7 @@ async def generate(house_graph: HouseGraph):
 
     if np.sum(room_corners) > 99:
         return {"Error": "Number of Corners exceeded"}
-    data_uri = create_layout(edges, room_corners, room_list)
+    data_uri = create_layout(edges, room_corners, room_list, house_graph.metrics)
     return {"dataUri": data_uri}
 
 
