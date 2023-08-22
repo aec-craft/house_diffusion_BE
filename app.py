@@ -54,8 +54,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-ROOM_CLASS = {'Living Room': 1, 'Kitchen': 2, 'Bedroom': 3, 'Bathroom': 4, 'Balcony': 5, 'Entrance': 6,
-              'Dining Room': 7,
+ROOM_CLASS = {'Living Room': 1, 'Kitchen': 2, 'Bedroom': 3, 'Bathroom': 4, 'Balcony': 5, 'Entrance': 6, 'Dining Room': 7,
               'Study Room': 8, 'Storage': 10, 'Front Door': 11, 'Unknown': 13, 'Interior Door': 12}
 
 
