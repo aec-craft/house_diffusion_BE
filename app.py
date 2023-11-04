@@ -95,14 +95,6 @@ async def generate(house_graph: HouseGraph):
         room_corners.append(4)
         edges.append([len(room_list) - 1, 1, living_room])
 
-    for x in range(len(room_list)):
-        for y in range(len(room_list)):
-            if y > x:
-                if any(np.equal([x, 1, y], edges).all(1)) or any(np.equal([y, 1, x], edges).all(1)):
-                    continue
-                else:
-                    edges.append([x, -1, y])
-
     if np.sum(room_corners) > 99:
         return {"Error": "Number of Corners exceeded"}
     data_uri = create_layout(edges, room_corners, room_list, house_graph.metrics)
