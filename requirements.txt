@@ -1,3 +1,4 @@
+#python version is 3.10 and CUDA is 11.8
 blobfile==2.0.2
 CairoSVG==2.7.1
 drawSvg==1.9.0

@@ -12,9 +12,7 @@ from house_diffusion.script_util import (
     args_to_dict,
     update_arg_parser,
 )
-import gdown
 from random import randint
-
 
 def create_layout(graphs, corners, room_type, metrics=False):
     dist_util.setup_dist()
@@ -53,9 +51,3 @@ def create_layout(graphs, corners, room_type, metrics=False):
         data_uri.append(pred)
 
     return data_uri
-
-
-url = 'https://drive.google.com/u/1/uc?id=16zKmtxwY5lF6JE-CJGkRf3-OFoD1TrdR&export=download'
-output = 'scripts/model.pt'
-if not os.path.isfile(output):
-    gdown.download(url, output, quiet=False)

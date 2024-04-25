@@ -14,9 +14,9 @@ pip install -r requirements.txt
 **2. Initiate the Backend**
 
 ```
-uvicorn app:app --host 0.0.0.0 
+uvicorn app:app --host 0.0.0.0 --port 8000
+
 ```
-- The pretrained model will be downloaded automatically from the Google Drive. [pretrained](https://drive.google.com/file/d/16zKmtxwY5lF6JE-CJGkRf3-OFoD1TrdR/view?usp=share_link)
 
 ## Endpoint
 
