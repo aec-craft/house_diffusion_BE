@@ -4,13 +4,15 @@
 ## Installation
 **1. Clone repo and install the requirements:**
 
-My implementation is based on the public implementation of [HouseDiffusion](https://github.com/aminshabani/house_diffusion.git). 
+Implementation is based on the public implementation of [HouseDiffusion](https://github.com/aminshabani/house_diffusion.git). 
 
 ```
 git clone https://github.com/sakmalh/house_diffusion
 cd house_diffusion
 pip install -r requirements.txt
 ```
+Add the model from the sharepoint or google drive into the scripts folder and name it as model.pt.
+
 **2. Initiate the Backend**
 
 ```
