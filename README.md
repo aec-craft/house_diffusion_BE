@@ -54,13 +54,9 @@ uvicorn app:app --host 0.0.0.0 --port 8000
 ```
 docker build -t {docker-repo}/backend .
 ```
-## Citation
+## Test Sample
 
+Run the following code:
 ```
-@article{shabani2022housediffusion,
-  title={HouseDiffusion: Vector Floorplan Generation via a Diffusion Model with Discrete and Continuous Denoising},
-  author={Shabani, Mohammad Amin and Hosseini, Sepidehsadat and Furukawa, Yasutaka},
-  journal={arXiv preprint arXiv:2211.13287},
-  year={2022}
-}
+python image_sample.py --dataset rplan --batch_size 32 --set_name eval-1 --target_set 6 --model_path ckpts/exp/model.pt --num_samples 5
 ```

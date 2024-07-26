@@ -94,7 +94,7 @@ get_one_hot = lambda x, z: np.eye(z)[x]
 class RPlanhgDataset(Dataset):
     def __init__(self, set_name, analog_bit, target_set, non_manhattan=False):
         super().__init__()
-        base_dir = '/home/akmal/APIIT/FYP Code/Housegan-data-reader/sample_output'
+        base_dir = 'sample_output'
         self.non_manhattan = non_manhattan
         self.set_name = set_name
         self.analog_bit = analog_bit
@@ -105,13 +105,13 @@ class RPlanhgDataset(Dataset):
         max_num_points = 100
         if self.set_name == 'eval':
             cnumber_dist = np.load(
-                f'/home/akmal/APIIT/FYP Code/house_diffusion/scripts/processed_rplan/rplan_train_{target_set}_cndist.npz',
+                f'scripts/processed_rplan/rplan_train_{target_set}_cndist.npz',
                 allow_pickle=True)[
                 'cnumber_dist'].item()
         if os.path.exists(
-                f'/home/akmal/APIIT/FYP Code/house_diffusion/scripts/processed_rplan/rplan_{set_name}_{target_set}.npz'):
+                f'scripts/processed_rplan/rplan_{set_name}_{target_set}.npz'):
             data = np.load(
-                f'/home/akmal/APIIT/FYP Code/house_diffusion/scripts/processed_rplan/rplan_{set_name}_{target_set}.npz',
+                f'scripts/processed_rplan/rplan_{set_name}_{target_set}.npz',
                 allow_pickle=True)
             self.graphs = data['graphs']
             self.houses = data['houses']
@@ -121,12 +121,12 @@ class RPlanhgDataset(Dataset):
             self.num_coords = 2
             self.max_num_points = max_num_points
             cnumber_dist = np.load(
-                f'/home/akmal/APIIT/FYP Code/house_diffusion/scripts/processed_rplan/rplan_train_{target_set}_cndist.npz',
+                f'scripts/processed_rplan/rplan_train_{target_set}_cndist.npz',
                 allow_pickle=True)[
                 'cnumber_dist'].item()
             if self.set_name == 'eval':
                 data = np.load(
-                    f'/home/akmal/APIIT/FYP Code/house_diffusion/scripts/processed_rplan/rplan_{set_name}_{target_set}_syn.npz',
+                    f'scripts/processed_rplan/rplan_{set_name}_{target_set}_syn.npz',
                     allow_pickle=True)
                 self.syn_graphs = data['graphs']
                 self.syn_houses = data['houses']
@@ -134,7 +134,7 @@ class RPlanhgDataset(Dataset):
                 self.syn_self_masks = data['self_masks']
                 self.syn_gen_masks = data['gen_masks']
         else:
-            with open('/home/akmal/APIIT/FYP Code/house_diffusion/list.txt') as f:
+            with open('/house_diffusion/list.txt') as f:
                 lines = f.readlines()
             cnt = 0
             for line in tqdm(lines):
@@ -169,7 +169,7 @@ class RPlanhgDataset(Dataset):
 
                 # build input graph
                 graph_nodes, graph_edges, rooms_mks = self.build_graph(rms_type, fp_eds, eds_to_rms)
-
+                
                 house = []
                 for room_mask, room_type in zip(rooms_mks, graph_nodes):
                     room_mask = room_mask.astype(np.uint8)
@@ -264,17 +264,17 @@ class RPlanhgDataset(Dataset):
             self.gen_masks = gen_masks
             self.num_coords = 2
             self.graphs = graphs
-            folder_name = "/home/akmal/APIIT/FYP Code/house_diffusion/scripts/processed_rplan"
+            folder_name = "/scripts/processed_rplan"
             if not os.path.exists(folder_name):
                 os.makedirs(folder_name)
             np.savez_compressed(
-                f'/home/akmal/APIIT/FYP Code/house_diffusion/scripts/processed_rplan/rplan_{set_name}_{target_set}',
+                f'/scripts/processed_rplan/rplan_{set_name}_{target_set}',
                 graphs=self.graphs,
                 houses=self.houses,
                 door_masks=self.door_masks, self_masks=self.self_masks, gen_masks=self.gen_masks)
             if self.set_name == 'train':
                 np.savez_compressed(
-                    f'/home/akmal/APIIT/FYP Code/house_diffusion/scripts/processed_rplan/rplan_{set_name}_{target_set}_cndist',
+                    f'/scripts/processed_rplan/rplan_{set_name}_{target_set}_cndist',
                     cnumber_dist=cnumber_dist)
 
             if set_name == 'eval':
@@ -352,7 +352,7 @@ class RPlanhgDataset(Dataset):
                 self.syn_gen_masks = gen_masks
                 self.syn_graphs = graphs
                 np.savez_compressed(
-                    f'/home/akmal/APIIT/FYP Code/house_diffusion/scripts/processed_rplan/rplan_{set_name}_{target_set}_syn',
+                    f'/scripts/processed_rplan/rplan_{set_name}_{target_set}_syn',
                     graphs=self.syn_graphs,
                     houses=self.syn_houses,
                     door_masks=self.syn_door_masks, self_masks=self.syn_self_masks,

@@ -22,7 +22,7 @@ def create_layout(graphs, corners, room_type, metrics=False):
     model.load_state_dict(
         dist_util.load_state_dict("scripts/model.pt", map_location="cpu")
     )
-    model.to(dist_util.dev())
+    model.to("cpu") #model.to(dist_util.dev())
     model.eval()
     ID_COLOR = {1: '#EE4D4D', 2: '#C67C7B', 3: '#FFD274', 4: '#BEBEBE', 5: '#BFE3E8',
                 6: '#7BA779', 7: '#E87A90', 8: '#FF8C69', 10: '#1F849B', 11: '#727171',
@@ -31,7 +31,7 @@ def create_layout(graphs, corners, room_type, metrics=False):
     sample_fn = (diffusion.p_sample_loop if not False else diffusion.ddim_sample_loop)
     model_kwargs = function_test(graphs, corners, room_type)
     for key in model_kwargs:
-        model_kwargs[key] = th.from_numpy(np.array([model_kwargs[key]])).cuda()
+        model_kwargs[key] = th.from_numpy(np.array([model_kwargs[key]]))#.cuda()
 
     data_uri = []
     for count in range(1):

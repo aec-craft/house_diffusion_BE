@@ -39,23 +39,22 @@ class HouseGraph(BaseModel):
 app = FastAPI()
 
 origins = [
-    "http://localhost.tiangolo.com",
-    "https://localhost.tiangolo.com",
-    "http://localhost",
-    "http://localhost:8080",
-    "http://localhost:3000"
+    "http://localhost:3000",  # Your frontend's origin
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-ROOM_CLASS = {'Living Room': 1, 'Kitchen': 2, 'Bedroom': 3, 'Bathroom': 4, 'Balcony': 5, 'Entrance': 6, 'Dining Room': 7,
-              'Study Room': 8, 'Storage': 10, 'Front Door': 11, 'Unknown': 13, 'Interior Door': 12}
+ROOM_CLASS = {
+    'Living Room': 1, 'Kitchen': 2, 'Bedroom': 3, 'Bathroom': 4, 'Balcony': 5,
+    'Entrance': 6, 'Dining Room': 7, 'Study Room': 8, 'Storage': 10, 'Front Door': 11,
+    'Unknown': 13, 'Interior Door': 12
+}
 
 
 @app.post("/generate")
@@ -102,6 +101,4 @@ async def generate(house_graph: HouseGraph):
 
 
 if __name__ == "__main__":
-    if uvicorn.run(app, host="0.0.0.0", port=8080):
-        print("Service started")
-        pass
+    uvicorn.run(app, host="0.0.0.0", port=8000)

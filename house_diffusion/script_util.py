@@ -83,7 +83,7 @@ def create_model_and_diffusion(
         use_checkpoint=False,
         use_unet=False,
         learn_sigma=False,
-        diffusion_steps=1000,
+        diffusion_steps=1000, # was 1000
         noise_schedule='cosine',
         timestep_respacing='',
         use_kl=False,

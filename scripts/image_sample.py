@@ -254,7 +254,7 @@ def save_samples(
                                 range(len(poly))]
 
                 if metrics:
-                    text_size = 5
+                    text_size = 3 # from
                     for z, length in enumerate(line_lengths):
                         # Calculate the mid-point of the line segment
                         midpoint = ((poly[z][0] + poly[(z + 1) % len(poly)][0]) / 2,
@@ -499,9 +499,9 @@ def create_argparser():
         num_samples=1,
         batch_size=1,
         use_ddim=False,
-        model_path="/home/akmal/APIIT/FYP Code/house_diffusion/ckpts/exp/model250000.pt",
-        draw_graph=False,
-        save_svg=False,
+        model_path="/ckpts/exp/model.pt",
+        draw_graph=True,
+        save_svg=True,
     )
     defaults.update(model_and_diffusion_defaults())
     parser = argparse.ArgumentParser()
