@@ -84,7 +84,7 @@ def create_model_and_diffusion(
         use_unet=False,
         learn_sigma=False,
         diffusion_steps=1000, # was 1000
-        noise_schedule='cosine',
+        noise_schedule='cosine', # forwared process is the cosine noise schedule
         timestep_respacing='',
         use_kl=False,
         predict_xstart=False,
